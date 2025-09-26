@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bryan Leonhart</title>
+    <style>
+        body {
+            font-family: 'Roboto Slab', serif;
+            margin: 0;
+            background: #181a1b;
+            color: #e0e0e0;
+        }
+        #results { margin-top: 20px; }
+        .result {
+            padding: 10px;
+            border-bottom: 1px solid #333;
+            background: #232526;
+            color: #e0e0e0;
+        }
+        input[type="text"], button {
+            background: #232526;
+            color: #e0e0e0;
+            border: 1px solid #444;
+            border-radius: 4px;
+            outline: none;
+        }
+        input[type="text"] {
+            padding: 8px 12px;
+        }
+        input[type="text"]::placeholder { color: #aaa; }
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover { background: #333; }
+        h1 { color: #fff; margin-bottom: 1em; }
+    </style>
+</head>
+<body>
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;width:100vw;">
+        <h1 style="font-size:3vw;">Enter Passcode</h1>
+        <div style="width:60vw;max-width:400px;">
+            <div style="display:flex;flex-direction:row;align-items:center;gap:8px;">
+                <input type="text" id="searchBox" placeholder="Enter Passcode..." autofocus style="font-size:1.5vw;width:70%;padding:2vw 2vw;min-width:120px;">
+                <button onclick="search()" style="font-size:1.5vw;padding:2vw 3vw;min-width:60px;">➥</button>
+            </div>
+        </div>
+        <div id="results" style="width:100%;"></div>
+    <script>
+        const data = [
+            { title: "aboutbryan", url: "aboutbryan.html" },
+            { title: "biography", url: "biography.html" },
+        ];
+        function search() {
+            const query = document.getElementById('searchBox').value.toLowerCase();
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            if (!query) return;
+            const results = data.filter(item => item.title.toLowerCase() === query);
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="text-align:center;margin-top:20px;">Incorrect Passcode</div>';
+                return;
+            }
+            results.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'result';
+                div.innerHTML = `<iframe src="${item.url}" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;border:none;" allowfullscreen></iframe>`;
+                resultsDiv.appendChild(div);
+            });
+        }
+        document.getElementById('searchBox').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') search();
+        });
+    </script>
+</body>
+</html>
