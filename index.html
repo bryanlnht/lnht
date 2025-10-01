@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<style>
+		:root {
+			--vscode-bg: #1e1e1e;
+			--vscode-panel: #252526;
+			--vscode-border: #333;
+			--vscode-text: #d4d4d4;
+			--vscode-accent: #007acc;
+			--vscode-accent-hover: #005a9e;
+			--vscode-danger: #f14c4c;
+			--vscode-danger-hover: #c72e2e;
+			--vscode-input-bg: #2d2d2d;
+			--vscode-input-border: #444;
+		}
+		body {
+			font-family: 'Segoe UI', 'Arial', sans-serif;
+			margin: 0;
+			background: var(--vscode-bg);
+			color: var(--vscode-text);
+			min-height: 100vh;
+		}
+		.container {
+			max-width: 700px;
+			margin: 3em auto;
+			background: var(--vscode-panel);
+			padding: 2em 2.5em;
+			border-radius: 10px;
+			box-shadow: 0 4px 24px #0008;
+			border: 1px solid var(--vscode-border);
+		}
+		h1 {
+			text-align: center;
+			margin-bottom: 1.5em;
+			color: var(--vscode-accent);
+			font-weight: 600;
+			letter-spacing: 1px;
+		}
+		form {
+			margin-bottom: 2em;
+		}
+		textarea {
+			width: 100%;
+			background: var(--vscode-input-bg);
+			color: var(--vscode-text);
+			border: 1px solid var(--vscode-input-border);
+			border-radius: 5px;
+			padding: 0.8em;
+			margin-bottom: 1em;
+			font-size: 1em;
+			transition: border 0.2s;
+		}
+		textarea:focus {
+			border-color: var(--vscode-accent);
+			outline: none;
+		}
+		button[type="submit"] {
+			background: var(--vscode-accent);
+			color: #fff;
+			border: none;
+			padding: 0.7em 1.6em;
+			border-radius: 6px;
+			font-size: 1em;
+			font-weight: 500;
+			cursor: pointer;
+			transition: background 0.2s, box-shadow 0.2s;
+			box-shadow: 0 2px 8px #0003;
+			margin-top: 0.5em;
+		}
+		button[type="submit"]:hover, button[type="submit"]:focus {
+			background: var(--vscode-accent-hover);
+		}
+		.message {
+			border-bottom: 1px solid var(--vscode-border);
+			padding: 1.2em 0;
+			display: flex;
+			flex-direction: column;
+			gap: 0.7em;
+		}
+		.delete-btn {
+			align-self: flex-end;
+			background: var(--vscode-danger);
+			color: #fff;
+			border: none;
+			padding: 0.5em 1.2em;
+			border-radius: 6px;
+			font-size: 0.97em;
+			font-weight: 500;
+			cursor: pointer;
+			transition: background 0.2s, box-shadow 0.2s;
+			box-shadow: 0 2px 8px #0002;
+			margin-top: 0.2em;
+		}
+		.delete-btn:hover, .delete-btn:focus {
+			background: var(--vscode-danger-hover);
+		}
+		@media (max-width: 600px) {
+			.container {
+				padding: 1em 0.5em;
+			}
+			button[type="submit"], .delete-btn {
+				width: 100%;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>Write what you feel about Bryan</h1>
+		<form id="blogForm">
+			<textarea id="message" rows="4" style="width:100%;" placeholder="Write your message..." required></textarea><br>
+			<button type="submit">Post Message</button>
+		</form>
+		<div id="messages"></div>
+	</div>
+	<script>
+		const SECRET_ID = "bryanlnht_92"; // Change this to your secret login ID
+
+		// Load messages from localStorage
+		function loadMessages() {
+			const messages = JSON.parse(localStorage.getItem('blogMessages') || '[]');
+			const messagesDiv = document.getElementById('messages');
+			messagesDiv.innerHTML = '';
+			messages.forEach((msg, idx) => {
+				const div = document.createElement('div');
+				div.className = 'message';
+				div.innerHTML = `
+					<div>${msg.text.replace(/\n/g, '<br>')}</div>
+					<button class="delete-btn" onclick="promptDeleteMessage(${idx})">Delete</button>
+				`;
+				messagesDiv.appendChild(div);
+			});
+		}
+
+		// Prompt for login ID before deleting
+		function promptDeleteMessage(idx) {
+			const input = prompt("Enter the secret login ID to delete this message:");
+			if (input === SECRET_ID) {
+				deleteMessage(idx);
+			} else if (input !== null) {
+				alert("Incorrect login ID.");
+			}
+		}
+
+		// Delete a message
+		function deleteMessage(idx) {
+			const messages = JSON.parse(localStorage.getItem('blogMessages') || '[]');
+			messages.splice(idx, 1);
+			localStorage.setItem('blogMessages', JSON.stringify(messages));
+			loadMessages();
+		}
+
+		// Handle form submission
+		document.getElementById('blogForm').onsubmit = function(e) {
+			e.preventDefault();
+			const text = document.getElementById('message').value.trim();
+			const messages = JSON.parse(localStorage.getItem('blogMessages') || '[]');
+			messages.unshift({ text });
+			localStorage.setItem('blogMessages', JSON.stringify(messages));
+			document.getElementById('blogForm').reset();
+			loadMessages();
+		};
+
+		// Initial load
+		loadMessages();
+		// Expose functions to global scope
+		window.deleteMessage = deleteMessage;
+		window.promptDeleteMessage = promptDeleteMessage;
+	</script>
+</body>
+</html>
